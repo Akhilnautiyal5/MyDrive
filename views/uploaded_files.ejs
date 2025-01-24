@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>File Upload and View</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link
+			href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css"
+			rel="stylesheet"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+		/>
+	</head>
+	<body class="bg-gray-500 dark:bg-gray-900">
+		<main class="content p-20">
+			<div class="flex justify-between">
+				<a href="/home">
+					<button
+						class="bg-blue-500 py-2 px-10 hover:bg-blue-700 text-white font-semibold rounded-md"
+					>
+						<i class="fas fa-solid fa-arrow-left"></i>
+					</button>
+				</a>
+				<form
+					id="logout-form"
+					action="/user/logout"
+					method="POST"
+					class="inline"
+				>
+					<button
+						type="submit"
+						class="bg-red-500 py-2 px-5 hover:bg-red-700 text-white font-semibold rounded-md"
+					>
+						Log-out
+						<span class="mx-1">
+							<i class="fas fa-right-from-bracket"></i>
+						</span>
+					</button>
+				</form>
+			</div>
+
+			<!-- Uploaded Files List -->
+			<div class="mt-10">
+				<h2 class="text-2xl text-white mb-4">Uploaded Files:</h2>
+				<div id="file_list" class="relative flex gap-4 flex-wrap">
+					<% files.reverse().forEach(function(file) { %>
+					<!-- Example of dynamically added files -->
+					<div class="relative">
+						<div
+							id="<%file.$id%>"
+							class="w-52 h-60 p-1 bg-zinc-700 text-white rounded-md overflow-hidden hover:scale-[1.01]"
+						>
+							<div class="mb-1 flex justify-between items-center">
+								<a href="/download/<%= file.$id %>">
+									<button
+										class="bg-blue-500 scale-[0.85] py-1 px-2 hover:bg-blue-700 text-white font-semibold rounded-md"
+									>
+										download
+									</button>
+								</a>
+								<div
+									id=""
+									class="three-dot-menu w-8 h-8 hover:bg-zinc-600 flex rounded-full justify-center items-center"
+								>
+									<i class="fas fa-ellipsis-v"></i>
+								</div>
+							</div>
+							<a href="/view/<%=file.$id%>" target="_blank">
+								<div
+									class="h-40 bg-zinc-500 content-center rounded-t-md overflow-hidden cursor-pointer"
+								>
+									<img
+										class="w-full h-full object-cover"
+										src="data:<%=file.mimeType%>;base64,<%= file.preview %>"
+										alt=""
+									/>
+								</div>
+							</a>
+
+							<div class="h-5 mt-1 text-center">
+								<p>
+									<%=48-file.name.trim().length < 20?file.name.substring(0, 18)
+									+ "...":file.name %>
+								</p>
+							</div>
+							<div
+								id=""
+								class="menu-list hidden absolute rounded-md right-2 top-8 w-24 bg-zinc-800"
+							>
+								<ul>
+									<li
+										class="rounded-t-md bg-zinc-600 hover:bg-blue-500"
+										onclick="fileDetails('<%= file.name %>', '<%= file.createdAt %>', '<%= file.mimeType %>', '<%= file.sizeOriginal %>')"
+									>
+										<p class="ml-1 w-20 text-white text-lg">Details</p>
+									</li>
+									<li
+										class="rounded-b-md hover:bg-red-600 bg-zinc-600"
+										onclick="deleteFile('<%= file.$id %>','<%= file.name %>')"
+									>
+										<p class="ml-1 w-20 text-white text-lg">Delete</p>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<!-- More files will be added here dynamically -->
+					<%})%>
+					<div
+						id="delete-popup"
+						class="hidden fixed inset-0 flex justify-center items-center text-white text-semibold"
+					>
+						<div
+							class="bg-zinc-800 w-96 h-52 p-2 text-semibold rounded-md flex flex-col justify-center items-center flex-wrap"
+						>
+							<p class="text-center">
+								Do you want to delete
+								<span id="file-to-delete" class="underline-offset-4"></span>?
+							</p>
+							<div class="mt-4 w-full flex justify-around items-center">
+								<button
+									id="confirm-delete"
+									class="bg-red-500 w-20 py-1 px-4 rounded-md hover:bg-red-600"
+								>
+									Yes
+								</button>
+								<button
+									id="cancel-delete"
+									class="bg-blue-500 w-20 py-1 px-4 rounded-md hover:bg-blue-600"
+								>
+									No
+								</button>
+							</div>
+						</div>
+					</div>
+					<!-- Details Sidebar -->
+					<div
+						id="details-sidebar"
+						class="hidden fixed inset-0 px-5 bg-black bg-opacity-50 flex justify-end items-center z-50"
+					>
+						<div
+							id="sidebar-content"
+							class="w-[400px] bg-zinc-800 p-5 text-white rounded-md overflow-y-auto flex-wrap h-[75vh]"
+						>
+							<h3 class="text-xl my-4 font-bold underline underline-offset-2">
+								&nbsp;File Details&nbsp;
+							</h3>
+							<div class="file-details-content flex flex-col justify-center">
+								<!-- File Name -->
+								<div class="my-2 pr-5">
+									<p class="font-semibold">Name:</p>
+									<p id="file-name" class="ml-4 mr-4 break-words"></p>
+								</div>
+
+								<!-- Created At -->
+								<div class="my-2 pr-5">
+									<p class="font-semibold">Created At:</p>
+									<p id="file-created-at" class="ml-4 mr-4"></p>
+								</div>
+
+								<!-- MIME Type -->
+								<div class="my-4 pr-5">
+									<p class="font-semibold">MIME Type:</p>
+									<p id="file-mime-type" class="ml-4 mr-4"></p>
+								</div>
+
+								<!-- File Size -->
+								<div class="my-4 pr-5">
+									<p class="font-semibold">Size:</p>
+									<p id="file-size" class="ml-4 mr-4"></p>
+								</div>
+							</div>
+							<button
+								id="close-sidebar"
+								class="mt-4 bg-red-500 py-1 px-4 rounded-md hover:bg-red-600"
+							>
+								Close
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+		<script src="script_file.js"></script>
+	</body>
+</html>

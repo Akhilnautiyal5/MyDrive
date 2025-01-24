@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>File Upload Popup</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link
+			href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css"
+			rel="stylesheet"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+		/>
+	</head>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		html,
+		body {
+			height: 100%;
+			width: 100%;
+			box-sizing: border-box;
+			overflow: hidden; /* Prevent scrollbars */
+		}
+
+		.video-background {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			object-fit: cover; /* Cover the entire viewport */
+			z-index: -1; /* Send the video behind other content */
+		}
+
+		.content {
+			position: relative;
+			z-index: 1; /* Bring content above the video */
+			color: white; /* Change text color for visibility */
+		}
+	</style>
+	<body class="bg-gray-500 dark:bg-gray-900">
+		<video
+			class="video-background"
+			src="/assets/night-sky-purple-moon-clouds-moewalls-com.mp4"
+			autoplay
+			loop
+			muted
+		></video>
+		<main class="content p-20">
+			<div class="flex justify-end">
+				<form
+					id="logout-form"
+					action="/user/logout"
+					method="POST"
+					class="inline"
+				>
+					<button
+						type="submit"
+						class="bg-red-500 py-2 px-5 hover:bg-red-700 text-white font-semibold rounded-md"
+					>
+						Log-out
+						<span class="mx-1">
+							<i class="fas fa-right-from-bracket"></i>
+						</span>
+					</button>
+				</form>
+			</div>
+			<!-- Upload Button -->
+			<div
+				class="flex flex-col justify-center items-center"
+			>
+				<div class="flex justify-center items-center">
+					<img class="w-28 h-28" src="assets\OneDriveSmallTile.contrast-black_scale-400.png" alt="drive" />
+					<div class="text-4xl text-white">My Drive</div>
+				</div>
+				<div class=" mt-5 text-xl text-zinc-300">
+					<p>File Size Limit:<span class="ml-2">50MB</span></p>
+				</div>
+			</div>
+			<div class="flex justify-around mt-10">	
+				<div
+					class="flex flex-col justify-center text-white text-semibold text-xl"
+				>
+					<h1>Uploaded Files here:</h1>
+					<button
+						id="show-popup-btn"
+						class="bg-blue-500 mt-5 py-2 px-4 hover:bg-blue-700 text-white font-semibold rounded-md"
+					>
+						Upload File
+					</button>
+				</div>
+				<div
+					class="flex flex-col justify-center text-white text-semibold text-xl"
+				>
+					<h1>View Uploaded Files here:</h1>
+					<a
+						href="/uploaded_files"
+						class="bg-blue-500 text-center mt-5 py-2 px-4 hover:bg-blue-700 text-white font-semibold rounded-md inline-block"
+					>
+						View Files
+					</a>
+				</div>
+			</div>
+			<!-- Popup -->
+			<div
+				id="popup"
+				class="hidden fixed top-0 left-0 w-screen h-screen flex items-center justify-center backdrop-blur bg-gray-800 bg-opacity-50"
+			>
+				<div
+					class="bg-white dark:bg-gray-700 rounded-lg p-6 w-[90%] h-96 max-w-lg"
+				>
+					<div class="flex justify-between items-center mb-4">
+						<h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+							Upload File
+						</h2>
+						<button
+							id="close-popup-btn"
+							class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-400"
+						>
+							&times;
+						</button>
+					</div>
+					<form action="/upload" method="post" enctype="multipart/form-data">
+						<label
+							id="dropzone"
+							for="dropzone-file"
+							class="flex flex-col items-center justify-center w-full h-60 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-600"
+						>
+							<div
+								id="dropzone-content"
+								class="flex flex-col items-center justify-center"
+							>
+								<svg
+									class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+									aria-hidden="true"
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 20 16"
+								>
+									<path
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+									/>
+								</svg>
+								<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+									<span class="font-semibold">Click to upload</span> or drag and
+									drop
+								</p>
+								<p class="text-xs text-gray-500 dark:text-gray-400">
+									SVG, PNG, JPG, or GIF (MAX. 800x400px)
+								</p>
+							</div>
+							<input
+								id="dropzone-file"
+								type="file"
+								class="hidden"
+								name="file"
+								required
+							/>
+						</label>
+						<div class="mt-4 text-right">
+							<button
+								type="submit"
+								class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+							>
+								Upload File
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</main>
+
+		<script src="script_home.js"></script>
+	</body>
+</html>
