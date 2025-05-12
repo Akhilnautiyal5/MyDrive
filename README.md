@@ -1,6 +1,9 @@
-# MyDrive - File Storage and Sharing Platform
+![Screenshot 2025-05-12 124609](https://github.com/user-attachments/assets/29917891-7692-49b1-99d4-fa9498bb2e64)# MyDrive - File Storage and Sharing Platform
 
 MyDrive is a web-based file storage application that allows users to upload, view, and download files securely across different devices. It uses Appwrite as the backend storage solution and implements user authentication for secure file management.
+
+![Screenshot 2025-05-12 124609](https://github.com/user-attachments/assets/e34027ff-9aa6-4c5b-ab42-bfe12583f39e)
+
 
 ## Features
 
